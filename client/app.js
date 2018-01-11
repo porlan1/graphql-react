@@ -7,6 +7,7 @@ class App extends Component {
 		return (
 			<div>
 				<AddPersonApollo/>
+				<GetPersonList/>
 			</div>
 		);
 	}
@@ -74,5 +75,54 @@ const AddPersonApollo = graphql(gql`mutation
   	name
   }
 }`)(AddPerson);
+
+class PersonList extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {people: []};
+	}
+	componentWillMount() {
+		console.log('Data:');
+		console.log(this.props.data);
+		this.props.data.refetch().then(function(res)
+			{console.log(res);
+				console.log(res.data.getPeople);
+				this.setState({people: res.data.getPeople})}.bind(this));
+	}
+	render() {
+		console.log(this.state);
+		return(
+			<div>
+				<table>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Favorite Food</th>
+							<th>Favorite Dessert</th>
+						</tr>
+					</thead>
+					<tbody>
+						{this.state.people.map((el)=>{
+							return(<tr key = {el.id}>
+								<td>{el.name}</td>
+								<td>{el.favoriteFood}</td>
+								<td>{el.favoriteDessert}</td>
+							</tr>)
+						})}
+					</tbody>
+				</table>
+			</div>
+		)
+	}
+}
+
+const GetPersonList = graphql(gql`{ 
+			getPeople{
+				id
+				name
+				favoriteFood
+				favoriteDessert
+			}
+		}`)(PersonList);
 
 export default App;
